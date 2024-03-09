@@ -1,0 +1,212 @@
+<template>
+    <div v-if="items.length === 0" class="d-flex flex-column full-row">
+      <ion-icon class="not-found" :icon="'/assets/icons/not-found.png'" />
+      <ion-text class="text-black">{{ `Sorry, "${searchKey}" is not found!!` }}</ion-text>
+    </div>
+  <ion-list v-else class="bg-transparent">
+    <ion-item v-for="item in items" :key="item.trackId" lines="none" class="bg-transparent" :details="false">
+      <div class="card d-flex flex-row">
+        <div class="image-container">
+          <ion-img :src="item.artworkUrl100" class="card-image" />
+        </div>
+        <div class="d-flex flex-column space-between full-row">
+          <div class="d-flex flex-column full-row">
+            <ion-text class="singer">{{ item.artistName }}</ion-text>
+            <ion-label class="song-text">{{
+              item.trackName ? item.trackName : "-"
+            }}</ion-label>
+          </div>
+          
+          <div class="d-flex flex-row space-between">
+            <div class="genre">{{ item.primaryGenreName }}</div>
+            <div class="d-flex flex-row price-part">
+                <div class="usd">$</div>
+                <ion-text class="price-info">{{
+                  item.trackPrice ? item.trackPrice : "-"
+                }}</ion-text>
+              </div>
+            </div>
+        </div>
+      </div>
+    </ion-item>
+    <ion-item v-if="showLoadMoreButton && items.length > 0" lines="none" class="bg-transparent">
+      <div class="d-flex flex-row item-load-more">
+        <div class="load-more" @click="loadMoreData">
+          <ion-text v-if="!isLoadMoreData">Load More</ion-text>
+          <ion-spinner v-else name="dots"></ion-spinner>
+        </div>
+      </div>
+    </ion-item>
+  </ion-list>
+  
+</template>
+
+<script>
+import { defineComponent, ref } from "vue";
+import { logoUsd } from "ionicons/icons";
+export default defineComponent({
+  props: {
+    items: Array,
+    loading: Boolean,
+    showLoadMoreButton: Boolean,
+    loadMore: Function,
+    searchKey: String
+  },
+  setup(props) {
+    const isLoadMoreData = ref(false);
+    const loadMoreData = async() => {
+        isLoadMoreData.value = true;
+        await props.loadMore();
+        isLoadMoreData.value = false;
+    }
+    return {
+      logoUsd,
+      isLoadMoreData,
+      loadMoreData
+    };
+  },
+});
+</script>
+
+<style scoped>
+.bg-transparent {
+  background: transparent;
+}
+.not-found {
+  height: 156px;
+  width: 156px;
+}
+ion-item {
+  --background: transparent;
+}
+.card {
+  width: 100%;
+  height: 120px;
+  margin: 12px;
+  padding: 12px 12px 11px 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background-color: #fff;
+}
+
+.image-container {
+  height: 96px;
+  width: 96px;
+  min-width: 96px;
+  max-width: 96px;
+  border-radius: 10%;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-image {
+  height: 96px;
+  width: 96px;
+  border-radius: 16px;
+  object-fit: cover;
+  display: block;
+}
+.singer {
+  font-size: 12px;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 0.5px;
+  color: #334155;
+}
+.song-text {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 0.5px;
+  color: #334155;
+}
+.d-flex {
+  display: flex;
+}
+.flex-row {
+  flex-direction: row;
+}
+.flex-column {
+  flex-direction: column;
+}
+.space-between {
+  justify-content: space-between;
+}
+.full-row {
+    width: 100%;;
+
+}
+.item-load-more {
+  width: 100%;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+.load-more {
+  width: fit-content;
+  height: 34px;
+  padding: 8px 20px;
+  border-radius: 17px;
+  background-color: #e2e8f0;
+  color: #3d5569;
+  margin-bottom: 8px;
+}
+.genre {
+  width: fit-content;
+  height: 20px;
+  margin: 43px 0px 0 0px;
+  padding: 5px 13px 4px;
+  border-radius: 10px;
+  background-color: #10b981;
+  font-size: 10px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 0.36px;
+  margin-top: 1px;
+}
+.price-part {
+  justify-content: right;
+  align-items: center;
+}
+.price-info {
+  margin: 1px 0 1px 6px;
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 0.43px;
+  color: #f5b014;
+}
+.usd {
+  height: 18px;
+  width: 18px;
+  border: solid 1px #f5b014;
+  border-radius: 100%;
+  color: #f5b014;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 1px;
+}
+ion-spinner {
+    margin-top: -3px;
+    --color: #712bda
+}
+.text-black {
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+</style>
