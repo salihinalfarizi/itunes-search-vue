@@ -1,0 +1,7 @@
+{
+  "name": "logique-tech",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
