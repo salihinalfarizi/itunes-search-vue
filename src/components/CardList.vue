@@ -8,7 +8,7 @@
       </div>
     </div>
   <ion-list v-else class="bg-transparent">
-    <ion-item v-for="item in items" :key="item.trackId" lines="none" class="bg-transparent" :details="false">
+    <ion-item v-for="item in items" :key="item.trackId" lines="none" class="bg-transparent" :details="false" @click="setOpenItemsDetail(true, item)">
       <div class="card d-flex flex-row">
         <div class="image-container">
           <ion-img :src="item.artworkUrl100" class="card-image">
@@ -36,6 +36,11 @@
             </div>
         </div>
       </div>
+      <!-- items detail -->
+
+   <ion-modal :cssClass="'bg-items-detail'" :is-open="isOpenItemsDetail" @didDismiss="setOpenItemsDetail(false, {})">
+        <items-detail :itemData="selectedItem" @closeItemsDetail="setOpenItemsDetail(false, {})" />
+      </ion-modal>
     </ion-item>
     <ion-item v-if="showLoadMoreButton && items.length > 0" lines="none" class="bg-transparent">
       <div class="d-flex flex-row item-load-more">
@@ -52,6 +57,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import { logoUsd, playCircleOutline } from "ionicons/icons";
+import ItemsDetail from "../views/ItemsDetail.vue";
 export default defineComponent({
   props: {
     items: Array,
@@ -60,8 +66,15 @@ export default defineComponent({
     loadMore: Function,
     searchKey: String
   },
+  components: {ItemsDetail},
   setup(props) {
     const isLoadMoreData = ref(false);
+    const isOpenItemsDetail = ref(false);
+    const selectedItem = ref({});
+    const setOpenItemsDetail = (val, itemDetail) => {
+      isOpenItemsDetail.value = val;
+      selectedItem.value = itemDetail;
+    };
     const loadMoreData = async() => {
         isLoadMoreData.value = true;
         await props.loadMore();
@@ -71,7 +84,10 @@ export default defineComponent({
       logoUsd,
       playCircleOutline,
       isLoadMoreData,
-      loadMoreData
+      loadMoreData,
+      selectedItem,
+      isOpenItemsDetail,
+      setOpenItemsDetail,
     };
   },
 });
@@ -80,6 +96,9 @@ export default defineComponent({
 <style scoped>
 .bg-transparent {
   background: transparent;
+}
+.bg-items-detail {
+  --ion-background-color: #f8fafc;
 }
 .not-found {
   height: 256px;

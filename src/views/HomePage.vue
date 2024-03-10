@@ -52,7 +52,7 @@
       ></card-list>
 
       <!-- search update modal -->
-      <ion-modal :is-open="isOpenUpdateSearch" :cssClass="'bg-modal'">
+      <ion-modal :is-open="isOpenUpdateSearch" @didDismiss="setOpenUpdateSearch(false)" :cssClass="'bg-modal'">
         <ion-header
           class="ion-no-border"
           :class="{ 'bg-transparent': isOpenUpdateSearch }"
