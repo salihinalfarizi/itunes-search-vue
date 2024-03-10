@@ -1,13 +1,16 @@
 <template>
-    <div v-if="items.length === 0" class="d-flex flex-column full-row">
-      <ion-icon class="not-found" :icon="'/assets/icons/not-found.png'" />
+    <div v-if="items.length === 0" class="d-flex flex-column full-row center">
+      <ion-img class="not-found" src="/assets/icons/not-found.png" />
       <ion-text class="text-black">{{ `Sorry, "${searchKey}" is not found!!` }}</ion-text>
     </div>
   <ion-list v-else class="bg-transparent">
     <ion-item v-for="item in items" :key="item.trackId" lines="none" class="bg-transparent" :details="false">
       <div class="card d-flex flex-row">
         <div class="image-container">
-          <ion-img :src="item.artworkUrl100" class="card-image" />
+          <ion-img :src="item.artworkUrl100" class="card-image">
+          </ion-img>
+          <ion-icon class="play-icon" :icon="playCircleOutline" />
+
         </div>
         <div class="d-flex flex-column space-between full-row">
           <div class="d-flex flex-column full-row">
@@ -15,6 +18,7 @@
             <ion-label class="song-text">{{
               item.trackName ? item.trackName : "-"
             }}</ion-label>
+            
           </div>
           
           <div class="d-flex flex-row space-between">
@@ -43,7 +47,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import { logoUsd } from "ionicons/icons";
+import { logoUsd, playCircleOutline } from "ionicons/icons";
 export default defineComponent({
   props: {
     items: Array,
@@ -61,6 +65,7 @@ export default defineComponent({
     }
     return {
       logoUsd,
+      playCircleOutline,
       isLoadMoreData,
       loadMoreData
     };
@@ -73,8 +78,14 @@ export default defineComponent({
   background: transparent;
 }
 .not-found {
-  height: 156px;
-  width: 156px;
+  height: 256px;
+  width: 256px;
+  margin-top: 20%;
+  margin-bottom: 16px;
+}
+.center {
+  justify-content: center;
+  align-items: center;
 }
 ion-item {
   --background: transparent;
@@ -109,6 +120,14 @@ ion-item {
   border-radius: 16px;
   object-fit: cover;
   display: block;
+}
+.play-icon {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  font-size: 3rem; /* Adjust the size as needed */
+  color: #ffffff; 
+  z-index: 999;
 }
 .singer {
   font-size: 12px;

@@ -27,13 +27,8 @@
         <ion-text class="search-res">{{ `Search result for :` }} </ion-text>
         <ion-text class="search-key">{{ searchTerm }}</ion-text>
       </div>
-      <div v-if="loading && searchResults.length === 0">
-        <skeleton-product-card
-          v-for="(item, index) in 6"
-          :key="index"
-          :detail="false"
-          class="skeleton"
-        />
+      <div v-if="loading && searchResults.length === 0" class="center">
+        <ion-spinner></ion-spinner>
     </div>
       <card-list
       v-else
@@ -77,9 +72,10 @@ import {
   IonToolbar,
   IonButton,
   IonIcon,
+  IonSpinner,
   IonInput,
 } from "@ionic/vue";
-import { computed, defineAsyncComponent, defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import CardList from "@/components/CardList.vue";
@@ -95,10 +91,8 @@ export default defineComponent({
     IonButton,
     IonIcon,
     IonInput,
-    CardList,
-    SkeletonProductCard: defineAsyncComponent(() =>
-      import("../components/SkeletonProductCard.vue")
-    ),
+    IonSpinner,
+    CardList
   },
   setup() {
     const router = useRouter();
@@ -225,6 +219,7 @@ ion-content::part(background) {
   --padding-start: 20px;
   --padding-end: 20px;
   --border-radius: 25px;
+  --border-color: transparent;
   text-align: center;
 }
 .btn-home-search {
@@ -233,6 +228,18 @@ ion-content::part(background) {
   --color: #ffffff;
   margin-top: 12px;
   margin-bottom: 12px;
+}
+.center {
+  margin-top: 30vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+ion-spinner {
+  height: 32px;
+  width: 32px;
+  --color: #000000;
 }
 ion-footer {
   --background: transparent;
@@ -298,8 +305,5 @@ ion-icon {
 .def-icon {
   height: 20px;
   width: 20px;
-}
-.skeleton {
-  margin: 16px 12px;
 }
 </style>
