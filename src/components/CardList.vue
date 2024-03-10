@@ -1,7 +1,11 @@
 <template>
     <div v-if="items.length === 0" class="d-flex flex-column full-row center">
-      <ion-img class="not-found" src="/assets/icons/not-found.png" />
-      <ion-text class="text-black">{{ `Sorry, "${searchKey}" is not found!!` }}</ion-text>
+      <div>
+        <ion-img class="not-found" src="/assets/icons/not-found.png" />
+      </div>
+      <div>
+        <ion-text class="text-black">{{ `Sorry, "${searchKey}" is not found!!` }}</ion-text>
+      </div>
     </div>
   <ion-list v-else class="bg-transparent">
     <ion-item v-for="item in items" :key="item.trackId" lines="none" class="bg-transparent" :details="false">

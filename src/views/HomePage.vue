@@ -1,16 +1,28 @@
 <template>
   <ion-page>
-    <ion-header v-if="isShowSearchResult" class="ion-no-border">
+    <ion-header
+      v-if="isShowSearchResult"
+      class="ion-no-border"
+      :class="{ 'home-header': isShowSearchResult }"
+    >
       <ion-toolbar>
         <div class="header-search">
           <ion-icon class="def-icon" :icon="menuOutline" />
           <ion-icon class="ngmusic" :icon="'/assets/icons/ngmusic.svg'" />
-          <ion-icon class="def-icon" :icon="searchOutline" />
+          <ion-icon
+            @click="setOpenUpdateSearch(loading ? false : true)"
+            class="def-icon"
+            :icon="searchOutline"
+          />
         </div>
       </ion-toolbar>
     </ion-header>
     <!-- home screen -->
-    <ion-content v-if="!isShowSearchResult" :fullscreen="true">
+    <ion-content
+      v-if="!isShowSearchResult"
+      :fullscreen="true"
+      :class="{ 'bg-home': !isShowSearchResult }"
+    >
       <div class="home-background">
         <div id="container">
           <ion-icon class="logo" :icon="'/assets/icons/logo.svg'" />
@@ -25,20 +37,58 @@
     >
       <div class="search-text-result">
         <ion-text class="search-res">{{ `Search result for :` }} </ion-text>
-        <ion-text class="search-key">{{ searchTerm }}</ion-text>
+        <ion-text class="search-key">{{ savedSearchTerm }}</ion-text>
       </div>
       <div v-if="loading && searchResults.length === 0" class="center">
         <ion-spinner></ion-spinner>
-    </div>
+      </div>
       <card-list
-      v-else
+        v-else
         :items="searchResults"
         :showLoadMoreButton="showLoadMore"
         :loadMore="loadMore"
         :searchKey="searchTerm"
         :loading="loading"
       ></card-list>
-      
+
+      <!-- search update modal -->
+      <ion-modal :is-open="isOpenUpdateSearch" :cssClass="'bg-modal'">
+        <ion-header
+          class="ion-no-border"
+          :class="{ 'bg-transparent': isOpenUpdateSearch }"
+        >
+          <ion-toolbar>
+            <ion-buttons slot="end">
+              <ion-button @click="setOpenUpdateSearch(false)">
+                <ion-icon class="def-icon" :icon="closeOutline" />
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content :fullscreen="true" class="ion-padding">
+          <div class="search-modal">
+            <ion-text>Search</ion-text>
+          </div>
+          <div class="foot">
+            <ion-input
+              class="search-input"
+              :clear-input="true"
+              placeholder="Search by Artist / Album / Title"
+              v-model="searchTerm"
+              @ionChange="updateKey($event)"
+            >
+            </ion-input>
+            <ion-button
+              @click="search()"
+              class="btn-modal-search"
+              expand="full"
+              shape="round"
+            >
+              Search
+            </ion-button>
+          </div>
+        </ion-content>
+      </ion-modal>
     </ion-content>
     <ion-footer v-if="!isShowSearchResult" class="ion-no-border">
       <div class="foot">
@@ -60,6 +110,14 @@
         </ion-button>
       </div>
     </ion-footer>
+    <ion-toast
+      :is-open="isOpenToastInfo"
+      message="Search key can not be empty !"
+      :duration="5000"
+      color="danger"
+      position="top"
+      @didDismiss="setOpenToast(false)"
+    ></ion-toast>
   </ion-page>
 </template>
 
@@ -74,12 +132,14 @@ import {
   IonIcon,
   IonSpinner,
   IonInput,
+  IonModal,
+  IonToast,
 } from "@ionic/vue";
 import { computed, defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import CardList from "@/components/CardList.vue";
-import { searchOutline, menuOutline } from "ionicons/icons";
+import { searchOutline, menuOutline, closeOutline } from "ionicons/icons";
 
 export default defineComponent({
   components: {
@@ -92,13 +152,16 @@ export default defineComponent({
     IonIcon,
     IonInput,
     IonSpinner,
-    CardList
+    IonModal,
+    IonToast,
+    CardList,
   },
   setup() {
     const router = useRouter();
     const loading = ref(false);
     const isShowSearchResult = ref(false);
     const searchTerm = ref("");
+    const savedSearchTerm = ref("")
     const searchResults = ref([]);
     const offset = ref(0);
     const limit = ref(15);
@@ -109,15 +172,26 @@ export default defineComponent({
       loading.value = val;
     };
 
+    const isOpenUpdateSearch = ref(false);
+    const isOpenToastInfo = ref(false);
+
+    const setOpenUpdateSearch = (val) => (isOpenUpdateSearch.value = val);
+    const setOpenToast = (val) => (isOpenToastInfo.value = val);
+
     const showLoadMore = computed(() => {
       return searchResults.value.length % limit.value === 0;
     });
 
     const search = async () => {
-      offset.value = 0;
-      isShowSearchResult.value = true;
-      setLoading(true);
-      await loadData();
+      if (searchTerm.value.length < 1) {
+        setOpenToast(true);
+      } else {
+        offset.value = 0;
+        isShowSearchResult.value = true;
+        setLoading(true);
+        setOpenUpdateSearch(false);
+        await loadData();
+      }
     };
     const loadMore = async () => {
       offset.value += limit.value;
@@ -140,6 +214,7 @@ export default defineComponent({
             ...response.data.results,
           ];
         }
+        savedSearchTerm.value = searchTerm.value
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -154,7 +229,9 @@ export default defineComponent({
       setLoading,
       searchOutline,
       menuOutline,
+      closeOutline,
       searchTerm,
+      savedSearchTerm,
       searchResults,
       offset,
       limit,
@@ -164,17 +241,28 @@ export default defineComponent({
       loadData,
       goTo,
       updateKey,
+      isOpenUpdateSearch,
+      setOpenUpdateSearch,
+      isOpenToastInfo,
+      setOpenToast,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-ion-content::part(background) {
-  background: linear-gradient(to bottom, #712bda, #a45deb);
+.bg-home {
+  --background: linear-gradient(to bottom, #712bda, #a45deb);
 }
 .search-result-background::part(background) {
-  background: #f8fafc;
+  --background: #f8fafc;
+}
+
+.bg-modal {
+  --ion-background-color: rgba(0, 0, 0, 0.4);
+}
+.bg-transparent {
+  background: transparent;
 }
 #container {
   text-align: center;
@@ -228,6 +316,24 @@ ion-content::part(background) {
   --color: #ffffff;
   margin-top: 12px;
   margin-bottom: 12px;
+  text-transform: none;
+}
+
+.btn-modal-search {
+  --background-activated: #a45deb;
+  --background: linear-gradient(to right, #712bda, #a45deb);
+  --color: #ffffff;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  text-transform: none;
+}
+.search-modal {
+  font-size: 20px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 30vh;
+  margin-bottom: 24px;
+  text-align: center;
 }
 .center {
   margin-top: 30vh;
@@ -263,7 +369,7 @@ ion-footer {
 ion-toolbar {
   --background: transparent;
 }
-ion-header {
+.home-header {
   margin: 0 0 39px;
   padding: 18px 15px 22.2px;
   box-shadow: 0 0 6px 0 rgba(148, 77, 230, 0.75);
@@ -305,5 +411,6 @@ ion-icon {
 .def-icon {
   height: 20px;
   width: 20px;
+  color: #ffffff;
 }
 </style>
