@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-header class="ion-no-border bg-transparent">
-      <ion-toolbar class="bg-transparent">
+      <ion-toolbar class="bg-transparent ion-padding">
         <div slot="start" class="back-icon" @click="closeItemsDetail">
           <ion-icon :icon="chevronBackOutline"> </ion-icon>
         </div>
