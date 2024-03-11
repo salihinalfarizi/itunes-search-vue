@@ -16,7 +16,7 @@
     <ion-content class="ion-padding" :fullscreen="true">
       <div class="content">
         <div class="image-container">
-          <ion-img class="image-item" :src="itemData.artworkUrl100" />
+          <img class="image-item" :src="itemData.artworkUrl100" />
         </div>
         <ion-text class="track-name">{{
           itemData.trackName ? itemData.trackName : "-"
@@ -93,7 +93,7 @@ export default defineComponent({
     IonContent,
     IonHeader,
     IonToolbar,
-    IonIcon,
+    IonIcon
   },
   setup(_, { emit }) {
     const goBack = () => {

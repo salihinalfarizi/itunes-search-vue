@@ -7,7 +7,7 @@
     >
       <ion-toolbar>
         <div class="header-search">
-          <ion-icon class="def-icon" :icon="menuOutline" />
+          <ion-icon @click="resetToHomeScreen()" class="def-icon" :icon="menuOutline" />
           <ion-icon class="ngmusic" :icon="'/assets/icons/ngmusic.svg'" />
           <ion-icon
             @click="setOpenUpdateSearch(loading ? false : true)"
@@ -20,6 +20,7 @@
     <!-- home screen -->
     <ion-content
       v-if="!isShowSearchResult"
+      class="ion-padding"
       :fullscreen="true"
       :class="{ 'bg-home': !isShowSearchResult }"
     >
@@ -33,9 +34,10 @@
     <ion-content
       v-else
       :fullscreen="true"
+      class="ion-padding"
       :class="{ 'search-result-background': isShowSearchResult }"
     >
-      <div class="search-text-result">
+      <div v-if="searchResults.length > 0"" class="search-text-result">
         <ion-text class="search-res">{{ `Search result for :` }} </ion-text>
         <ion-text class="search-key">{{ savedSearchTerm }}</ion-text>
       </div>
@@ -220,6 +222,13 @@ export default defineComponent({
       }
       setLoading(false);
     };
+    const resetToHomeScreen = () => {
+      isShowSearchResult.value = false;
+      searchTerm.value = '';
+      savedSearchTerm.value = '';
+      searchResults.value = [];
+
+    };
     const goTo = (path) => {
       router.push(path);
     };
@@ -241,6 +250,7 @@ export default defineComponent({
       loadData,
       goTo,
       updateKey,
+      resetToHomeScreen,
       isOpenUpdateSearch,
       setOpenUpdateSearch,
       isOpenToastInfo,
@@ -261,9 +271,7 @@ export default defineComponent({
 .bg-modal {
   --ion-background-color: rgba(0, 0, 0, 0.4);
 }
-.bg-transparent {
-  background: transparent;
-}
+
 #container {
   text-align: center;
   position: absolute;
@@ -289,15 +297,6 @@ export default defineComponent({
   text-decoration: none;
 }
 
-.text-center {
-  text-align: center;
-}
-
-.logo {
-  height: 84px;
-  width: 84px;
-}
-
 .search-input {
   --background-activated: #8a8a8a94;
   --background: #ffffff;
@@ -309,6 +308,7 @@ export default defineComponent({
   --border-radius: 25px;
   --border-color: transparent;
   text-align: center;
+  min-height: 48px;
 }
 .btn-home-search {
   --background-activated: #ffffff3a;
@@ -317,6 +317,7 @@ export default defineComponent({
   margin-top: 12px;
   margin-bottom: 12px;
   text-transform: none;
+  min-height: 48px;
 }
 
 .btn-modal-search {
@@ -326,6 +327,7 @@ export default defineComponent({
   margin-top: 12px;
   margin-bottom: 12px;
   text-transform: none;
+  min-height: 48px;
 }
 .search-modal {
   font-size: 20px;
@@ -408,9 +410,5 @@ ion-icon {
     color: #7b34dd;
   }
 }
-.def-icon {
-  height: 20px;
-  width: 20px;
-  color: #ffffff;
-}
+
 </style>
