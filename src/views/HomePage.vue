@@ -37,7 +37,7 @@
       class="ion-padding"
       :class="{ 'search-result-background': isShowSearchResult }"
     >
-      <div v-if="searchResults.length > 0"" class="search-text-result">
+      <div v-if="searchResults.length > 0" class="search-text-result">
         <ion-text class="search-res">{{ `Search result for :` }} </ion-text>
         <ion-text class="search-key">{{ savedSearchTerm }}</ion-text>
       </div>
